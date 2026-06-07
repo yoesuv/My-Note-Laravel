@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
 {
@@ -49,7 +50,11 @@ class AuthService
 
     public function logout(User $user): void
     {
-        $user->currentAccessToken()?->delete();
+        $accessToken = $user->currentAccessToken();
+
+        if ($accessToken instanceof PersonalAccessToken) {
+            $accessToken->delete();
+        }
     }
 
     /**
