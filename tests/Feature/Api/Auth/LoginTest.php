@@ -58,4 +58,28 @@ class LoginTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email', 'password']);
     }
+
+    public function test_login_is_rate_limited_by_email_and_ip(): void
+    {
+        User::factory()->create([
+            'email' => 'limited@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.20'])
+                ->postJson('/api/login', [
+                    'email' => 'limited@example.com',
+                    'password' => 'wrong-password',
+                ])
+                ->assertUnprocessable();
+        }
+
+        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.20'])
+            ->postJson('/api/login', [
+                'email' => 'limited@example.com',
+                'password' => 'wrong-password',
+            ])
+            ->assertTooManyRequests();
+    }
 }

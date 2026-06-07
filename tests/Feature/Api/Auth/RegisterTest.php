@@ -63,4 +63,25 @@ class RegisterTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email']);
     }
+
+    public function test_register_is_rate_limited(): void
+    {
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.10'])
+                ->postJson('/api/register', [
+                    'full_name' => 'Rate Limited User',
+                    'email' => "rate{$attempt}@example.com",
+                    'password' => 'secret123',
+                ])
+                ->assertCreated();
+        }
+
+        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.10'])
+            ->postJson('/api/register', [
+                'full_name' => 'Rate Limited User',
+                'email' => 'rate6@example.com',
+                'password' => 'secret123',
+            ])
+            ->assertTooManyRequests();
+    }
 }
