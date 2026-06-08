@@ -2,6 +2,8 @@
 
 Login authenticates an existing user with email and password, then returns a Sanctum Bearer token.
 
+Successful login issues a Sanctum token named `api-token`. Before issuing the new token, the API revokes any existing tokens for the same user that also use the `api-token` name. Tokens with other names are not revoked.
+
 ## Endpoint
 
 ```http
@@ -28,8 +30,22 @@ Accept: application/json
 
 | Field | Rules |
 | --- | --- |
-| `email` | required, valid email format |
+| `email` | required, valid email format; expected as a string value |
 | `password` | required, string |
+
+Before validation and authentication, `email` is normalized by casting the input to a string, trimming surrounding whitespace, and converting it to lowercase using Laravel's Unicode-aware string handling.
+
+For example, this email input:
+
+```txt
+  TEST@example.com  
+```
+
+is treated as:
+
+```txt
+test@example.com
+```
 
 ## Success Response
 
@@ -60,6 +76,21 @@ Use the returned token for protected API routes:
 ```http
 Authorization: Bearer 1|plain-text-sanctum-token
 ```
+
+## Token Behavior
+
+- The returned token is stored in `personal_access_tokens` with the name `api-token`.
+- On every successful login, previous tokens named `api-token` for the same user are deleted before the new token is created.
+- Tokens with other names, such as `mobile-token`, are preserved.
+- This means the default login endpoint allows only one active `api-token` per user at a time.
+
+Example:
+
+| Existing token name | After successful login |
+| --- | --- |
+| `api-token` | Deleted and replaced |
+| `mobile-token` | Preserved |
+| `desktop-token` | Preserved |
 
 ## Error Cases
 

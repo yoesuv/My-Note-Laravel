@@ -10,6 +10,8 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
 {
+    private const API_TOKEN_NAME = 'api-token';
+
     public function __construct(
         private readonly UserRepository $users,
     ) {}
@@ -45,6 +47,8 @@ class AuthService
             ]);
         }
 
+        $user->tokens()->where('name', self::API_TOKEN_NAME)->delete();
+
         return $this->authResponse($user);
     }
 
@@ -64,7 +68,7 @@ class AuthService
     {
         return [
             'user' => $user,
-            'token' => $user->createToken('api-token')->plainTextToken,
+            'token' => $user->createToken(self::API_TOKEN_NAME)->plainTextToken,
         ];
     }
 }

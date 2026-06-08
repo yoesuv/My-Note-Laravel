@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class UserRepository
 {
@@ -16,6 +17,6 @@ class UserRepository
 
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', $email)->first();
+        return User::where('email', Str::lower(trim($email)))->first();
     }
 }
