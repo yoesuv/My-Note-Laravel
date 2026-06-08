@@ -18,8 +18,8 @@
 ## Database and tests
 - `.env.example` defaults to SQLite, but this project is intended to use MySQL for local app development; keep DB credentials only in `.env`.
 - `phpunit.xml` forces tests to SQLite in-memory (`DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`), so tests do not use the local MySQL database unless config is changed.
-- Queue, session, and cache default to database-backed drivers in `.env.example`; migrations include users, cache, jobs, and Sanctum `personal_access_tokens` tables.
-- `DatabaseSeeder` calls `UserSeeder`; seeded test user is `test@example.com` / `password`.
+- Queue, session, and cache default to database-backed drivers in `.env.example`; migrations include users, cache, jobs, Sanctum `personal_access_tokens`, and categories tables.
+- `DatabaseSeeder` calls `UserSeeder` and `CategorySeeder`; seeded test user is `test@example.com` / `password` with categories `Personal`, `Work`, and `Ideas`.
 
 ## API auth conventions
 - Auth endpoints live in `routes/api.php`.
@@ -35,9 +35,25 @@
 - API exposes `full_name`, but stores it in the `users.name` database column.
 - Login intentionally returns a generic invalid credentials message for unknown email and wrong password.
 
+## API categories conventions
+- Category endpoints live in `routes/api.php` and are protected by `auth:sanctum`.
+- Category flow follows `Controller -> Service -> Repository`.
+- Protected endpoints:
+  - `GET /api/categories`
+  - `POST /api/categories`
+  - `GET /api/categories/{category}`
+  - `PUT/PATCH /api/categories/{category}`
+  - `DELETE /api/categories/{category}`
+- Categories belong to users; all category lookups must be scoped to the authenticated user.
+- Category names are trimmed before validation/storage.
+- Category names are unique per user case-insensitively via `categories.name_normalized` and a unique index on `user_id + name_normalized`.
+- Category color is stored as lowercase 6-digit hex varchar, e.g. `#f39c12`.
+- Malformed category route IDs should return 404; `routes/api.php` constrains `{category}` to numeric IDs.
+
 ## Documentation
 - API login documentation: `docs/login.md`
 - API register documentation: `docs/register.md`
+- API categories documentation: `docs/categories.md`
 
 ## Conventions/gotchas
 - `.npmrc` has `ignore-scripts=true`; use the Composer `setup` script or `npm install --ignore-scripts` to match repo behavior.
