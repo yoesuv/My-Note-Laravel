@@ -38,7 +38,7 @@ class CategoryRepository
     {
         $category->update($data);
 
-        return $category->refresh();
+        return $category;
     }
 
     public function delete(Category $category): void
