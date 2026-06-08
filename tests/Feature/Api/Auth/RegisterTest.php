@@ -2,7 +2,11 @@
 
 namespace Tests\Feature\Api\Auth;
 
+use App\Models\User;
+use App\Repositories\UserRepository;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PDOException;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
@@ -64,6 +68,82 @@ class RegisterTest extends TestCase
             ->assertJsonValidationErrors(['email']);
     }
 
+    public function test_register_stores_trimmed_lowercase_email(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'full_name' => 'Case User',
+            'email' => '  CASE@example.com  ',
+            'password' => 'secret123',
+        ]);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('data.user.email', 'case@example.com');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'case@example.com',
+        ]);
+    }
+
+    public function test_register_email_unique_validation_uses_normalized_email(): void
+    {
+        $this->postJson('/api/register', [
+            'full_name' => 'First User',
+            'email' => 'same@example.com',
+            'password' => 'secret123',
+        ])->assertCreated();
+
+        $response = $this->postJson('/api/register', [
+            'full_name' => 'Second User',
+            'email' => '  SAME@example.com  ',
+            'password' => 'secret123',
+        ]);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_register_duplicate_email_insert_collision_returns_validation_error_for_sqlite(): void
+    {
+        $this->bindUserRepositoryThatThrows($this->queryException(
+            sqlState: '23000',
+            driverCode: 19,
+            message: 'UNIQUE constraint failed: users.email',
+        ));
+
+        $response = $this->postJson('/api/register', [
+            'full_name' => 'Race User',
+            'email' => 'race@example.com',
+            'password' => 'secret123',
+        ]);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['email'])
+            ->assertJsonPath('errors.email.0', 'The email has already been taken.');
+    }
+
+    public function test_register_duplicate_email_insert_collision_returns_validation_error_for_mysql(): void
+    {
+        $this->bindUserRepositoryThatThrows($this->queryException(
+            sqlState: '23000',
+            driverCode: 1062,
+            message: "Duplicate entry 'race@example.com' for key 'users_email_unique'",
+        ));
+
+        $response = $this->postJson('/api/register', [
+            'full_name' => 'Race User',
+            'email' => 'race@example.com',
+            'password' => 'secret123',
+        ]);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['email'])
+            ->assertJsonPath('errors.email.0', 'The email has already been taken.');
+    }
+
     public function test_register_is_rate_limited(): void
     {
         for ($attempt = 1; $attempt <= 5; $attempt++) {
@@ -83,5 +163,29 @@ class RegisterTest extends TestCase
                 'password' => 'secret123',
             ])
             ->assertTooManyRequests();
+    }
+
+    private function bindUserRepositoryThatThrows(QueryException $exception): void
+    {
+        $this->app->bind(UserRepository::class, fn () => new class($exception) extends UserRepository
+        {
+            public function __construct(private readonly QueryException $exception) {}
+
+            /**
+             * @param  array{name: string, email: string, password: string}  $data
+             */
+            public function create(array $data): User
+            {
+                throw $this->exception;
+            }
+        });
+    }
+
+    private function queryException(string $sqlState, int $driverCode, string $message): QueryException
+    {
+        $previous = new PDOException($message);
+        $previous->errorInfo = [$sqlState, $driverCode, $message];
+
+        return new QueryException('testing', 'insert into users', [], $previous);
     }
 }

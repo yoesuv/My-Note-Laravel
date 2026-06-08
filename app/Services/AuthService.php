@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -22,11 +23,15 @@ class AuthService
      */
     public function register(array $data): array
     {
-        $user = $this->users->create([
-            'name' => $data['full_name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        try {
+            $user = $this->users->create([
+                'name' => $data['full_name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
+        } catch (QueryException $exception) {
+            $this->handleDuplicateEmailQueryException($exception);
+        }
 
         return $this->authResponse($user);
     }
@@ -70,5 +75,46 @@ class AuthService
             'user' => $user,
             'token' => $user->createToken(self::API_TOKEN_NAME)->plainTextToken,
         ];
+    }
+
+    /**
+     * @throws QueryException
+     * @throws ValidationException
+     */
+    private function handleDuplicateEmailQueryException(QueryException $exception): never
+    {
+        if ($this->isDuplicateEmailQueryException($exception)) {
+            $this->throwEmailTakenValidationException();
+        }
+
+        throw $exception;
+    }
+
+    private function isDuplicateEmailQueryException(QueryException $exception): bool
+    {
+        $sqlState = (string) ($exception->errorInfo[0] ?? $exception->getCode());
+        $driverCode = (int) ($exception->errorInfo[1] ?? 0);
+        $message = $exception->getMessage().' '.(string) ($exception->errorInfo[2] ?? '');
+
+        if (! in_array($sqlState, ['23000', '23505'], true)) {
+            return false;
+        }
+
+        if ($sqlState === '23000' && ! in_array($driverCode, [19, 1062, 2067], true)) {
+            return false;
+        }
+
+        return str_contains($message, 'users.email')
+            || str_contains($message, 'users_email_unique');
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    private function throwEmailTakenValidationException(): never
+    {
+        throw ValidationException::withMessages([
+            'email' => ['The email has already been taken.'],
+        ]);
     }
 }
