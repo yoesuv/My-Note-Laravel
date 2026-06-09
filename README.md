@@ -1,58 +1,270 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# My Note Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+My Note Laravel is a Laravel 13 API application for user authentication, category management, and note management. It uses Laravel Sanctum Bearer tokens for API authentication and follows a layered backend structure: `Controller -> Service -> Repository`.
 
-## About Laravel
+## Current Status
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laravel application built on `laravel/framework` `^13.8` and PHP `^8.3`.
+- Sanctum token authentication is installed and used for protected API routes.
+- Public authentication endpoints are available for registration and login.
+- Protected endpoints are available for the authenticated user profile, logout, categories, and notes.
+- Categories are user-scoped and enforce case-insensitive name uniqueness per user.
+- Notes are user-scoped and must belong to one of the authenticated user's categories.
+- API documentation exists in `docs/` for auth, categories, and notes.
+- Feature tests cover auth, categories, notes, and repository behavior.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend:** Laravel 13, PHP 8.3+
+- **Authentication:** Laravel Sanctum API tokens
+- **Database:** SQLite by default in `.env.example`; MySQL intended for local app development if configured in `.env`
+- **Frontend tooling:** Vite 8, Tailwind CSS 4, `laravel-vite-plugin`
+- **Testing:** PHPUnit 12 with SQLite in-memory database
+- **Formatting:** Laravel Pint
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP `^8.3`
+- Composer
+- Node.js and npm
+- SQLite for quick setup, or MySQL for local app development
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Quick Setup
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Use the project setup script for a first-time install:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer run setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+This command will:
 
-## Contributing
+1. Install Composer dependencies.
+2. Copy `.env.example` to `.env` if `.env` does not exist.
+3. Generate `APP_KEY`.
+4. Run database migrations.
+5. Install npm dependencies with `--ignore-scripts`.
+6. Build frontend assets.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> Note: `.npmrc` disables npm scripts by default. Use `npm install --ignore-scripts` if installing npm dependencies manually.
 
-## Code of Conduct
+## Manual Setup
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+If you prefer to run each step manually:
 
-## Security Vulnerabilities
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install --ignore-scripts
+npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+If you want seed data for local development:
+
+```bash
+php artisan db:seed
+```
+
+Seed data includes:
+
+- User: `test@example.com`
+- Password: `password`
+- Default categories: `Personal`, `Work`, `Ideas`
+- Example notes under those categories
+
+## Database Configuration
+
+`.env.example` defaults to SQLite:
+
+```env
+DB_CONNECTION=sqlite
+```
+
+For local MySQL development, update only your local `.env` file:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=my_note_laravel
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Then run:
+
+```bash
+php artisan migrate --seed
+```
+
+Do not commit real database credentials.
+
+## Running the App
+
+Start the full local development stack:
+
+```bash
+composer run dev
+```
+
+This runs Laravel's development server, queue listener, Pail logs, and Vite together.
+
+Useful individual commands:
+
+```bash
+php artisan serve
+npm run dev
+npm run build
+```
+
+## API Overview
+
+All API routes are defined in `routes/api.php`.
+
+### API Flow
+
+The flowchart below shows the typical client flow: register or login, receive a Sanctum Bearer token, then use protected category and note endpoints.
+
+```mermaid
+flowchart TD
+    user["User"] --> client["Client app or API tool"]
+    client --> auth{"Has an account?"}
+
+    auth -->|"No"| register["POST /api/register"]
+    auth -->|"Yes"| login["POST /api/login"]
+
+    register --> token["Receive Sanctum Bearer token"]
+    login --> token
+
+    token --> protected["Call protected My Note API routes"]
+    protected --> me["GET /api/me"]
+    protected --> categories["Category CRUD"]
+    protected --> notes["Note CRUD"]
+    protected --> logout["POST /api/logout"]
+
+    categories --> categoryRules["Trim names, lowercase colors, reject case-insensitive duplicates per user"]
+    notes --> noteRules["Validate category ownership and keep notes scoped to authenticated user"]
+
+    categoryRules --> database[("Application database")]
+    noteRules --> database
+    me --> database
+
+    logout --> revoked["Current token revoked"]
+    database --> isolated["Each user's categories and notes stay isolated"]
+```
+
+### Public Routes
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/api/register` | Register a user and return a Sanctum token |
+| `POST` | `/api/login` | Login and return a Sanctum token |
+
+### Protected Routes
+
+Protected routes require:
+
+```http
+Authorization: Bearer <token>
+Accept: application/json
+```
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/api/me` | Return the authenticated user |
+| `POST` | `/api/logout` | Revoke the current token |
+| `GET` | `/api/categories` | List categories |
+| `POST` | `/api/categories` | Create a category |
+| `GET` | `/api/categories/{category}` | Show a category |
+| `PUT/PATCH` | `/api/categories/{category}` | Update a category |
+| `DELETE` | `/api/categories/{category}` | Delete a category |
+| `GET` | `/api/notes` | List notes, optionally filtered by `category_id` |
+| `POST` | `/api/notes` | Create a note |
+| `GET` | `/api/notes/{note}` | Show a note |
+| `PUT/PATCH` | `/api/notes/{note}` | Update a note |
+| `DELETE` | `/api/notes/{note}` | Delete a note |
+
+Route IDs for categories and notes are constrained to numeric values. Malformed IDs return `404`.
+
+## API Documentation
+
+Detailed endpoint documentation is available in:
+
+- [API Register](docs/register.md)
+- [API Login](docs/login.md)
+- [API Categories](docs/categories.md)
+- [API Notes](docs/notes.md)
+
+Recommended reading path:
+
+1. Start with [API Register](docs/register.md) or [API Login](docs/login.md) to get a token.
+2. Read [API Categories](docs/categories.md) because notes require a category.
+3. Read [API Notes](docs/notes.md) for note CRUD and filtering behavior.
+
+## Development Conventions
+
+- API auth uses Sanctum with `auth:sanctum` middleware.
+- Auth, category, and note features follow `Controller -> Service -> Repository`.
+- API responses expose `full_name`, while the database stores the value in `users.name`.
+- Login returns a generic invalid credentials message for unknown email and wrong password.
+- Category names are trimmed before validation and storage.
+- Category names are unique per user case-insensitively through `categories.name_normalized`.
+- Category colors are stored as lowercase 6-digit hex strings, for example `#f39c12`.
+- Notes are always scoped to the authenticated user.
+- A note's `category_id` must reference a category owned by the authenticated user.
+
+## Testing
+
+Run all backend tests:
+
+```bash
+composer run test
+```
+
+Run a focused test:
+
+```bash
+php artisan test --filter=NoteTest
+```
+
+Testing uses SQLite in-memory through `phpunit.xml`:
+
+```xml
+<env name="DB_CONNECTION" value="sqlite"/>
+<env name="DB_DATABASE" value=":memory:"/>
+```
+
+This means tests do not use your local MySQL database unless the test configuration is changed.
+
+## Code Style
+
+Format PHP code with Laravel Pint:
+
+```bash
+./vendor/bin/pint
+```
+
+## Project Structure
+
+Important locations:
+
+```txt
+app/Http/Controllers/Api/   API controllers
+app/Http/Requests/          Form request validation
+app/Http/Resources/         API response resources
+app/Models/                 Eloquent models
+app/Repositories/           Persistence layer
+app/Services/               Business logic layer
+database/migrations/        Database schema
+database/seeders/           Local seed data
+docs/                       API documentation
+routes/api.php              API routes
+routes/web.php              Web routes
+tests/                      PHPUnit tests
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
