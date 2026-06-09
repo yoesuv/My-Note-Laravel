@@ -1,5 +1,7 @@
 # My Note Laravel
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/57b92ff5542c4de79715eb384291b5dd)](https://app.codacy.com/gh/yoesuv/My-Note-Laravel/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/57b92ff5542c4de79715eb384291b5dd)](https://app.codacy.com/gh/yoesuv/My-Note-Laravel/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+
 My Note Laravel is a Laravel 13 API application for user authentication, category management, and note management. It uses Laravel Sanctum Bearer tokens for API authentication and follows a layered backend structure: `Controller -> Service -> Repository`.
 
 ## Current Status
@@ -157,10 +159,10 @@ flowchart TD
 
 ### Public Routes
 
-| Method | Endpoint | Description |
-| --- | --- | --- |
+| Method | Endpoint        | Description                                |
+| ------ | --------------- | ------------------------------------------ |
 | `POST` | `/api/register` | Register a user and return a Sanctum token |
-| `POST` | `/api/login` | Login and return a Sanctum token |
+| `POST` | `/api/login`    | Login and return a Sanctum token           |
 
 ### Protected Routes
 
@@ -171,20 +173,20 @@ Authorization: Bearer <token>
 Accept: application/json
 ```
 
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `GET` | `/api/me` | Return the authenticated user |
-| `POST` | `/api/logout` | Revoke the current token |
-| `GET` | `/api/categories` | List categories |
-| `POST` | `/api/categories` | Create a category |
-| `GET` | `/api/categories/{category}` | Show a category |
-| `PUT/PATCH` | `/api/categories/{category}` | Update a category |
-| `DELETE` | `/api/categories/{category}` | Delete a category |
-| `GET` | `/api/notes` | List notes, optionally filtered by `category_id` |
-| `POST` | `/api/notes` | Create a note |
-| `GET` | `/api/notes/{note}` | Show a note |
-| `PUT/PATCH` | `/api/notes/{note}` | Update a note |
-| `DELETE` | `/api/notes/{note}` | Delete a note |
+| Method      | Endpoint                     | Description                                      |
+| ----------- | ---------------------------- | ------------------------------------------------ |
+| `GET`       | `/api/me`                    | Return the authenticated user                    |
+| `POST`      | `/api/logout`                | Revoke the current token                         |
+| `GET`       | `/api/categories`            | List categories                                  |
+| `POST`      | `/api/categories`            | Create a category                                |
+| `GET`       | `/api/categories/{category}` | Show a category                                  |
+| `PUT/PATCH` | `/api/categories/{category}` | Update a category                                |
+| `DELETE`    | `/api/categories/{category}` | Delete a category                                |
+| `GET`       | `/api/notes`                 | List notes, optionally filtered by `category_id` |
+| `POST`      | `/api/notes`                 | Create a note                                    |
+| `GET`       | `/api/notes/{note}`          | Show a note                                      |
+| `PUT/PATCH` | `/api/notes/{note}`          | Update a note                                    |
+| `DELETE`    | `/api/notes/{note}`          | Delete a note                                    |
 
 Route IDs for categories and notes are constrained to numeric values. Malformed IDs return `404`.
 
