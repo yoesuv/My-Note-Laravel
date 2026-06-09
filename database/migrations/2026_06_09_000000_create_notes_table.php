@@ -11,16 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('notes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('name', 100);
-            $table->string('name_normalized', 100);
-            $table->string('color', 7);
+            $table->foreignId('category_id');
+            $table->string('title', 150);
+            $table->text('content')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id', 'name_normalized']);
-            $table->unique(['user_id', 'id']);
+            $table->index(['user_id', 'category_id']);
+            $table->foreign(['user_id', 'category_id'])
+                ->references(['user_id', 'id'])
+                ->on('categories')
+                ->cascadeOnDelete();
         });
     }
 
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('notes');
     }
 };

@@ -2,21 +2,20 @@
 
 namespace App\Models;
 
-use Database\Factories\CategoryFactory;
+use Database\Factories\NoteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'name_normalized', 'color'])]
-class Category extends Model
+#[Fillable(['category_id', 'title', 'content'])]
+class Note extends Model
 {
-    /** @use HasFactory<CategoryFactory> */
+    /** @use HasFactory<NoteFactory> */
     use HasFactory;
 
     /**
-     * @return BelongsTo<User, Category>
+     * @return BelongsTo<User, Note>
      */
     public function user(): BelongsTo
     {
@@ -24,10 +23,10 @@ class Category extends Model
     }
 
     /**
-     * @return HasMany<Note, Category>
+     * @return BelongsTo<Category, Note>
      */
-    public function notes(): HasMany
+    public function category(): BelongsTo
     {
-        return $this->hasMany(Note::class);
+        return $this->belongsTo(Category::class);
     }
 }

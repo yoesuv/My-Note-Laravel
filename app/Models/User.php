@@ -28,6 +28,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany<Note, User>
+     */
+    public function notes(): HasMany
+    {
+        return $this->hasMany(Note::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

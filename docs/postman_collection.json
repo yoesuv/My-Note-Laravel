@@ -1,0 +1,1606 @@
+{
+  "info": {
+    "name": "My Note Laravel API",
+    "description": "Postman collection generated from docs/login.md, docs/register.md, docs/categories.md, and docs/notes.md. Includes auth, category, and note success plus documented error-case requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has token', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "    pm.collectionVariables.set('auth_token', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "Authenticates an existing user and returns a Sanctum Bearer token named api-token. Successful login stores the token in collection variable auth_token."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"full_name\": \"Test User\",\n      \"email\": \"test@example.com\"\n    },\n    \"token\": \"1|plain-text-sanctum-token\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Missing Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The email field is required.\",\n  \"errors\": {\n    \"email\": [\n      \"The email field is required.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Invalid Email Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The email field must be a valid email address.\",\n  \"errors\": {\n    \"email\": [\n      \"The email field must be a valid email address.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Missing Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The password field is required.\",\n  \"errors\": {\n    \"password\": [\n      \"The password field is required.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Email Not Registered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"unknown@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The provided credentials are incorrect.\",\n  \"errors\": {\n    \"email\": [\n      \"The provided credentials are incorrect.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Wrong Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrong-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The provided credentials are incorrect.\",\n  \"errors\": {\n    \"email\": [\n      \"The provided credentials are incorrect.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Rate Limited",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 429', function () {",
+                  "    pm.response.to.have.status(429);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrong-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "Login is rate limited to 5 requests per minute per email + IP address. Run this request repeatedly to trigger the 429 response."
+          },
+          "response": [
+            {
+              "name": "429 Too Many Requests",
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Too Many Attempts.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has token', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "    pm.collectionVariables.set('auth_token', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"email\": \"new-user@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            },
+            "description": "Creates a new user account and returns a Sanctum Bearer token. Successful register stores the token in collection variable auth_token. The API uses full_name, stored as users.name."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"User registered successfully.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"full_name\": \"Test User\",\n      \"email\": \"test@example.com\"\n    },\n    \"token\": \"1|plain-text-sanctum-token\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Missing Full Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The full name field is required.\",\n  \"errors\": {\n    \"full_name\": [\n      \"The full name field is required.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Full Name Too Short",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"A\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The full name field must be at least 2 characters.\",\n  \"errors\": {\n    \"full_name\": [\n      \"The full name field must be at least 2 characters.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Full Name Too Long",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"A very long full name that is intentionally longer than one hundred characters for validation testing purposes in Postman\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The full name field must not be greater than 100 characters.\",\n  \"errors\": {\n    \"full_name\": [\n      \"The full name field must not be greater than 100 characters.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Missing Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The email field is required.\",\n  \"errors\": {\n    \"email\": [\n      \"The email field is required.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Invalid Email Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"email\": \"not-an-email\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The email field must be a valid email address.\",\n  \"errors\": {\n    \"email\": [\n      \"The email field must be a valid email address.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Email Already Registered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The email has already been taken.\",\n  \"errors\": {\n    \"email\": [\n      \"The email has already been taken.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Missing Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"email\": \"test@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The password field is required.\",\n  \"errors\": {\n    \"password\": [\n      \"The password field is required.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Password Too Short",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"The password field must be at least 6 characters.\",\n  \"errors\": {\n    \"password\": [\n      \"The password field must be at least 6 characters.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Rate Limited",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 429', function () {",
+                  "    pm.response.to.have.status(429);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            },
+            "description": "Register is rate limited to 5 requests per minute per IP address. Run this request repeatedly to trigger the 429 response."
+          },
+          "response": [
+            {
+              "name": "429 Too Many Requests",
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Too Many Attempts.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "me"
+              ]
+            },
+            "description": "Returns the authenticated user. Run Login - Success or Register - Success first to populate auth_token."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"full_name\": \"Test User\",\n    \"email\": \"test@example.com\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('auth_token', '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "logout"
+              ]
+            },
+            "description": "Logs out the authenticated user by deleting current tokens. Clears auth_token after success."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Logout successful.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "description": "Protected category routes. Run Login - Success or Register - Success first to populate auth_token.",
+      "item": [
+        {
+          "name": "List Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories"]
+            },
+            "description": "Lists categories for the authenticated user."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Ideas\",\n      \"color\": \"#9b59b6\",\n      \"created_at\": \"2026-06-08T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-08T00:00:00.000000Z\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"Personal\",\n      \"color\": \"#3498db\",\n      \"created_at\": \"2026-06-08T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-08T00:00:00.000000Z\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.category && json.data.category.id) {",
+                  "    pm.collectionVariables.set('category_id', json.data.category.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \" Work \" ,\n  \"color\": \"#F39C12\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories"]
+            },
+            "description": "Creates a category. Name is trimmed and color is normalized to lowercase. Stores returned id in category_id."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Category created successfully.\",\n  \"data\": {\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Work\",\n      \"color\": \"#f39c12\",\n      \"created_at\": \"2026-06-08T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-08T00:00:00.000000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Show Category",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/categories/{{category_id}}", "host": ["{{base_url}}"], "path": ["api", "categories", "{{category_id}}"]},
+            "description": "Shows a single category scoped to the authenticated user."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Work\",\n    \"color\": \"#f39c12\",\n    \"created_at\": \"2026-06-08T00:00:00.000000Z\",\n    \"updated_at\": \"2026-06-08T00:00:00.000000Z\"\n  }\n}"}]
+        },
+        {
+          "name": "Update Category - PATCH",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Personal\",\n  \"color\": \"#3498db\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/categories/{{category_id}}", "host": ["{{base_url}}"], "path": ["api", "categories", "{{category_id}}"]},
+            "description": "Updates category name and color. PUT is also supported."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Category updated successfully.\",\n  \"data\": {\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Personal\",\n      \"color\": \"#3498db\",\n      \"created_at\": \"2026-06-08T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-08T00:05:00.000000Z\"\n    }\n  }\n}"}]
+        },
+        {
+          "name": "Update Category - PUT",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Personal\",\n  \"color\": \"#3498db\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/categories/{{category_id}}", "host": ["{{base_url}}"], "path": ["api", "categories", "{{category_id}}"]},
+            "description": "Updates category using PUT."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category - Partial Color",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"color\": \"#2ecc71\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/categories/{{category_id}}", "host": ["{{base_url}}"], "path": ["api", "categories", "{{category_id}}"]},
+            "description": "Partial updates are allowed. Supplied fields must pass the same rules."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/categories/{{category_id}}", "host": ["{{base_url}}"], "path": ["api", "categories", "{{category_id}}"]},
+            "description": "Deletes a category scoped to the authenticated user."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Category deleted successfully.\"\n}"}]
+        },
+        {
+          "name": "Categories - Unauthenticated",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 401', function () {", "    pm.response.to.have.status(401);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/categories", "host": ["{{base_url}}"], "path": ["api", "categories"]}
+          },
+          "response": [{"name": "401 Unauthorized", "status": "Unauthorized", "code": 401, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Unauthenticated.\"\n}"}]
+        },
+        {
+          "name": "Create Category - Missing Name",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"color\": \"#f39c12\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/categories", "host": ["{{base_url}}"], "path": ["api", "categories"]}
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The name field is required.\",\n  \"errors\": {\n    \"name\": [\n      \"The name field is required.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Create Category - Invalid Color",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Work\",\n  \"color\": \"f39c12\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/categories", "host": ["{{base_url}}"], "path": ["api", "categories"]}
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The color field format is invalid.\",\n  \"errors\": {\n    \"color\": [\n      \"The color field format is invalid.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Create Category - Duplicate Name",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \" work \" ,\n  \"color\": \"#f39c12\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/categories", "host": ["{{base_url}}"], "path": ["api", "categories"]},
+            "description": "Category names are unique per user after trimming and lowercasing. Work, work, WORK, and WoRk conflict."
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The name has already been taken.\",\n  \"errors\": {\n    \"name\": [\n      \"The name has already been taken.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Show Category - Not Found",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 404', function () {", "    pm.response.to.have.status(404);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/categories/999999", "host": ["{{base_url}}"], "path": ["api", "categories", "999999"]},
+            "description": "Returned when the category does not exist, the ID is malformed, or the category belongs to another user."
+          },
+          "response": [{"name": "404 Not Found", "status": "Not Found", "code": 404, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"No query results for model [App\\\\Models\\\\Category].\"\n}"}]
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "description": "Protected note routes. Run Login - Success or Register - Success first to populate auth_token. Notes belong to the authenticated user and one owned category.",
+      "item": [
+        {
+          "name": "List Notes",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]},
+            "description": "Lists notes for the authenticated user."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"category_id\": 1,\n      \"title\": \"Sprint planning\",\n      \"content\": \"Prepare backlog\",\n      \"category\": {\n        \"id\": 1,\n        \"name\": \"Work\",\n        \"color\": \"#f39c12\",\n        \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n        \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n      },\n      \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n    }\n  ]\n}"}]
+        },
+        {
+          "name": "List Notes - Filter by Category",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/notes?category_id={{category_id}}", "host": ["{{base_url}}"], "path": ["api", "notes"], "query": [{"key": "category_id", "value": "{{category_id}}"}]},
+            "description": "Lists notes filtered by category_id. The category must belong to the authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Note",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 201', function () {", "    pm.response.to.have.status(201);", "});", "", "const json = pm.response.json();", "if (json.data && json.data.note && json.data.note.id) {", "    pm.collectionVariables.set('note_id', json.data.note.id);", "}"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": {{category_id}},\n  \"title\": \" Sprint planning \",\n  \"content\": \" Prepare backlog \"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]},
+            "description": "Creates a note. title and content are trimmed. Stores returned id in note_id. content may be omitted or null."
+          },
+          "response": [{"name": "201 Created", "status": "Created", "code": 201, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Note created successfully.\",\n  \"data\": {\n    \"note\": {\n      \"id\": 1,\n      \"category_id\": 1,\n      \"title\": \"Sprint planning\",\n      \"content\": \"Prepare backlog\",\n      \"category\": {\n        \"id\": 1,\n        \"name\": \"Work\",\n        \"color\": \"#f39c12\",\n        \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n        \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n      },\n      \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n    }\n  }\n}"}]
+        },
+        {
+          "name": "Create Note - Null Content",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 201', function () {", "    pm.response.to.have.status(201);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": {{category_id}},\n  \"title\": \"Note without content\",\n  \"content\": null\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]},
+            "description": "Creates a note with nullable content."
+          },
+          "response": []
+        },
+        {
+          "name": "Show Note",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/notes/{{note_id}}", "host": ["{{base_url}}"], "path": ["api", "notes", "{{note_id}}"]},
+            "description": "Shows a single note scoped to the authenticated user."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"data\": {\n    \"id\": 1,\n    \"category_id\": 1,\n    \"title\": \"Sprint planning\",\n    \"content\": \"Prepare backlog\",\n    \"category\": {\n      \"id\": 1,\n      \"name\": \"Work\",\n      \"color\": \"#f39c12\",\n      \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n    },\n    \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n    \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n  }\n}"}]
+        },
+        {
+          "name": "Update Note - PATCH",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": {{category_id}},\n  \"title\": \"Updated title\",\n  \"content\": \"Updated content\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes/{{note_id}}", "host": ["{{base_url}}"], "path": ["api", "notes", "{{note_id}}"]},
+            "description": "Updates category_id, title, and content. PUT is also supported. category_id must belong to the authenticated user."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Note updated successfully.\",\n  \"data\": {\n    \"note\": {\n      \"id\": 1,\n      \"category_id\": 2,\n      \"title\": \"Updated title\",\n      \"content\": \"Updated content\",\n      \"category\": {\n        \"id\": 2,\n        \"name\": \"Ideas\",\n        \"color\": \"#9b59b6\",\n        \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n        \"updated_at\": \"2026-06-09T00:00:00.000000Z\"\n      },\n      \"created_at\": \"2026-06-09T00:00:00.000000Z\",\n      \"updated_at\": \"2026-06-09T00:05:00.000000Z\"\n    }\n  }\n}"}]
+        },
+        {
+          "name": "Update Note - PUT",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": {{category_id}},\n  \"title\": \"Updated title\",\n  \"content\": \"Updated content\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes/{{note_id}}", "host": ["{{base_url}}"], "path": ["api", "notes", "{{note_id}}"]},
+            "description": "Updates note using PUT."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Note - Partial Null Content",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"content\": null\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes/{{note_id}}", "host": ["{{base_url}}"], "path": ["api", "notes", "{{note_id}}"]},
+            "description": "Partial updates are allowed. This clears content."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Note",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 200', function () {", "    pm.response.to.have.status(200);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/notes/{{note_id}}", "host": ["{{base_url}}"], "path": ["api", "notes", "{{note_id}}"]},
+            "description": "Deletes a note scoped to the authenticated user."
+          },
+          "response": [{"name": "200 OK", "status": "OK", "code": 200, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Note deleted successfully.\"\n}"}]
+        },
+        {
+          "name": "Notes - Unauthenticated",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 401', function () {", "    pm.response.to.have.status(401);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "auth": {"type": "noauth"},
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]}
+          },
+          "response": [{"name": "401 Unauthorized", "status": "Unauthorized", "code": 401, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"Unauthenticated.\"\n}"}]
+        },
+        {
+          "name": "Create Note - Invalid or Unowned Category",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": 999999,\n  \"title\": \"Sprint planning\",\n  \"content\": \"Prepare backlog\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]},
+            "description": "Returned when category_id is missing, malformed, nonexistent, or belongs to another user."
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The selected category id is invalid.\",\n  \"errors\": {\n    \"category_id\": [\n      \"The selected category id is invalid.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Create Note - Missing Category",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"title\": \"Sprint planning\",\n  \"content\": \"Prepare backlog\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]}
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The selected category id is invalid.\",\n  \"errors\": {\n    \"category_id\": [\n      \"The selected category id is invalid.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Create Note - Missing Title",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": {{category_id}},\n  \"content\": \"Prepare backlog\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]}
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The title field is required.\",\n  \"errors\": {\n    \"title\": [\n      \"The title field is required.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Create Note - Blank Title",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 422', function () {", "    pm.response.to.have.status(422);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Accept", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"category_id\": {{category_id}},\n  \"title\": \"   \",\n  \"content\": \"Prepare backlog\"\n}", "options": {"raw": {"language": "json"}}},
+            "url": {"raw": "{{base_url}}/api/notes", "host": ["{{base_url}}"], "path": ["api", "notes"]}
+          },
+          "response": [{"name": "422 Unprocessable Entity", "status": "Unprocessable Entity", "code": 422, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"The title field is required.\",\n  \"errors\": {\n    \"title\": [\n      \"The title field is required.\"\n    ]\n  }\n}"}]
+        },
+        {
+          "name": "Show Note - Not Found",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status code is 404', function () {", "    pm.response.to.have.status(404);", "});"], "type": "text/javascript"}}],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/api/notes/999999", "host": ["{{base_url}}"], "path": ["api", "notes", "999999"]},
+            "description": "Returned when the note does not exist, the ID is malformed, or the note belongs to another user."
+          },
+          "response": [{"name": "404 Not Found", "status": "Not Found", "code": 404, "_postman_previewlanguage": "json", "header": [], "cookie": [], "body": "{\n  \"message\": \"No query results for model [App\\\\Models\\\\Note].\"\n}"}]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "auth_token",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": "1"
+    },
+    {
+      "key": "note_id",
+      "value": "1"
+    }
+  ]
+}
